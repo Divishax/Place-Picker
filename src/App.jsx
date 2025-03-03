@@ -10,6 +10,7 @@ import { sortPlacesByDistance } from "./loc.js";
 function App() {
   const modal = useRef();
   const selectedPlace = useRef();
+  const [availablePlaces, setAvalilablePlaces] = useState();
   const [pickedPlaces, setPickedPlaces] = useState([]);
 
   navigator.geolocation.getCurrentPosition((position) => {
@@ -18,6 +19,13 @@ function App() {
       position.coords.latitude,
       position.coords.longitude
     );
+    setAvalilablePlaces(sortedPalces);
+    // this solution actually has a flaw => because it would cause an infinite Loop
+    // why is that
+    // because we are updating the state here
+    // and calling such a state updating function tell React to re-execute the component function to which the state belongs (The App component in this case)
+    // now what happens if App compenent gets executes again?
+    // Well, we fetch the user's location again and again and again
   });
 
   function handleStartRemovePlace(id) {
@@ -72,7 +80,7 @@ function App() {
         />
         <Places
           title="Available Places"
-          places={AVAILABLE_PLACES}
+          places={availablePlaces}
           onSelectPlace={handleSelectPlace}
         />
       </main>
