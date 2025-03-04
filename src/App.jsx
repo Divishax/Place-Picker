@@ -56,6 +56,15 @@ function App() {
       const place = AVAILABLE_PLACES.find((place) => place.id === id);
       return [place, ...prevPickedPlaces];
     });
+
+    // this is a side effect and it doesnt need useEffect()
+    const storedIds = JSON.parse(localStorage.getItem("selectedPlaces")) || [];
+    if (storedIds.indexOf(id) === -1) {
+      localStorage.setItem(
+        "selectedPlaces",
+        JSON.stringify([id, ...storedIds])
+      );
+    }
   }
 
   function handleRemovePlace() {
@@ -92,8 +101,7 @@ function App() {
         <Places
           title="Available Places"
           places={availablePlaces}
-          //places={AVAILABLE_PLACES}
-          // fallbackText="Sorting Places by Distance..."
+          fallbackText="Sorting Places by Distance..."
           onSelectPlace={handleSelectPlace}
         />
       </main>
