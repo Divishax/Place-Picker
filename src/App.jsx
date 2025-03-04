@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Places from "./components/Places.jsx";
 import { AVAILABLE_PLACES } from "./data.js";
@@ -10,23 +10,34 @@ import { sortPlacesByDistance } from "./loc.js";
 function App() {
   const modal = useRef();
   const selectedPlace = useRef();
-  const [availablePlaces, setAvalilablePlaces] = useState();
+  const [availablePlaces, setAvalilablePlaces] = useState([]);
   const [pickedPlaces, setPickedPlaces] = useState([]);
 
-  navigator.geolocation.getCurrentPosition((position) => {
-    const sortedPalces = sortPlacesByDistance(
-      AVAILABLE_PLACES,
-      position.coords.latitude,
-      position.coords.longitude
-    );
-    setAvalilablePlaces(sortedPalces);
-    // this solution actually has a flaw => because it would cause an infinite Loop
-    // why is that
-    // because we are updating the state here
-    // and calling such a state updating function tell React to re-execute the component function to which the state belongs (The App component in this case)
-    // now what happens if App compenent gets executes again?
-    // Well, we fetch the user's location again and again and again
-  });
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPalces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+      setAvalilablePlaces(sortedPalces);
+    });
+  }, []);
+
+  // navigator.geolocation.getCurrentPosition((position) => {
+  //   const sortedPalces = sortPlacesByDistance(
+  //     AVAILABLE_PLACES,
+  //     position.coords.latitude,
+  //     position.coords.longitude
+  //   );
+  //   setAvalilablePlaces(sortedPalces);
+  //   // this solution actually has a flaw => because it would cause an infinite Loop
+  //   // why is that
+  //   // because we are updating the state here
+  //   // and calling such a state updating function tell React to re-execute the component function to which the state belongs (The App component in this case)
+  //   // now what happens if App compenent gets executes again?
+  //   // Well, we fetch the user's location again and again and again
+  // });
 
   function handleStartRemovePlace(id) {
     modal.current.open();
@@ -81,6 +92,8 @@ function App() {
         <Places
           title="Available Places"
           places={availablePlaces}
+          //places={AVAILABLE_PLACES}
+          // fallbackText="Sorting Places by Distance..."
           onSelectPlace={handleSelectPlace}
         />
       </main>
